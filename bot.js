@@ -2,11 +2,6 @@ var Discord = require('discord.io');
 var logger = require('winston');
 var auth = require('./auth.json');
 
-let ciatek = {}
-let members_of_Ciatek = []
-let channels_of_ciatek = []
-
-
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(new logger.transports.Console, {
@@ -18,6 +13,12 @@ var bot = new Discord.Client({
    token: auth.token,
    autorun: true
 });
+
+let ciatek = {}
+let members_of_Ciatek = []
+let channels_of_ciatek = []
+
+
 bot.on('ready', function (evt) {
     logger.info('Connected');
     logger.info('Logged in as: ');
@@ -67,6 +68,8 @@ bot.on('ready', function (evt) {
 
     // ************************** Get Channels of Ciatek Finish **************************
 
+    // console.log(ciatek)
+
 });
 bot.on('message', async function (user, userID, channelID, message, evt) {
     // Our bot needs to know if it will execute a command
@@ -105,6 +108,23 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
                     to: channelID,
                     message: `Name of the Server is ${ciatek.name}`
                 });
+                bot.uploadFile({
+                    to: channelID,
+                    file: "./assets/images/cia.png"
+                })
+            break;
+            
+            case 'ciatek':
+                bot.sendMessage({
+                    to: channelID,
+                    message: ` 
+                    Welcome to Ciatek
+                    `
+                });
+                bot.uploadFile({
+                    to: channelID,
+                    file: "./assets/images/cia.png"
+                })
             break;
             
             case 'help':
@@ -116,6 +136,7 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
                         !server_name
                         !resources
                         !channels
+                        !ciatek
                     `
                 });
             break;

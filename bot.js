@@ -2,7 +2,9 @@ var Discord = require('discord.io');
 var logger = require('winston');
 var auth = require('./auth.json');
 
+let ciatek = {}
 let members_of_Ciatek = []
+let channels_of_ciatek = []
 
 
 // Configure logger settings
@@ -21,7 +23,8 @@ bot.on('ready', function (evt) {
     logger.info('Logged in as: ');
     logger.info(bot.username + ' - (' + bot.id + ')');
 
-    // get all member of Ciatek Server
+    // ************************** Get all member of Ciatek Server Start **************************
+
     let members = bot.servers['497486687681773579'].members
     // initializing members array
     let members_array = []
@@ -44,6 +47,26 @@ bot.on('ready', function (evt) {
             members_of_Ciatek = membersFilter
         }
     }
+
+    // ************************** Get Members of Ciatek Finish **************************
+
+    // ************************** Get Channels of Ciatek Start **************************
+    
+    ciatek = bot.servers['497486687681773579']
+    // console.log(ciatek.channels)
+    for(ids in ciatek.channels){
+        // console.log(ciatek.channels[ids])
+        let channels = ciatek.channels[ids]
+        for(channel in channels){
+            let index = channels_of_ciatek.indexOf(channels)
+            if(index < 0){
+                channels_of_ciatek.push(channels)
+            }
+        }
+    }
+
+    // ************************** Get Channels of Ciatek Finish **************************
+
 });
 bot.on('message', async function (user, userID, channelID, message, evt) {
     // Our bot needs to know if it will execute a command
@@ -59,7 +82,7 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
             case 'ping':
                 bot.sendMessage({
                     to: channelID,
-                    message: `Pong! Latency is ${message.createdTimestamp}ms. API Latency is ${Math.round(parseInt(bot.ping))}ms`
+                    message: `Pong!`
                 });
             break;
            
@@ -67,6 +90,33 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
                 bot.sendMessage({
                     to: channelID,
                     message: `Members of Ciatek are: ${members_of_Ciatek.map( (member) => `# ${member}`)}`
+                });
+            break;
+            
+            case 'channels':
+                bot.sendMessage({
+                    to: channelID,
+                    message: `Channels of Ciatek are: ${channels_of_ciatek.map( channel => `# ${channel.name}`)}`
+                });
+            break;
+            
+            case 'server_name':
+                bot.sendMessage({
+                    to: channelID,
+                    message: `Name of the Server is ${ciatek.name}`
+                });
+            break;
+            
+            case 'help':
+                bot.sendMessage({
+                    to: channelID,
+                    message: `🚀 Commands you can use are:
+                        !ping
+                        !members
+                        !server_name
+                        !resources
+                        !channels
+                    `
                 });
             break;
             

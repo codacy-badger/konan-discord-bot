@@ -1,136 +1,108 @@
-var Discord = require('discord.io');
-var logger = require('winston');
-var auth = require('./auth.json');
+const Discord = require("discord.io");
+const logger = require("winston");
+const auth = require("./auth.json");
+const Scripts = require("./scripts");
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
-logger.add(new logger.transports.Console, {
-    colorize: true
+logger.add(new logger.transports.Console(), {
+  colorize: true
 });
-logger.level = 'debug';
+logger.level = "debug";
+
 // Initialize Discord Bot
-var bot = new Discord.Client({
-   token: auth.token,
-   autorun: true
+const bot = new Discord.Client({
+  token: auth.token,
+  autorun: true
 });
 
-let ciatek = {}
-let members_of_Ciatek = []
-let channels_of_ciatek = []
+let new_member = {};
+let ciatek = {};
+let members_of_Ciatek_UserName = [];
+let channels_of_ciatek = [];
 
+bot.on("ready", function(evt) {
+  logger.info("Connected");
+  logger.info("Logged in as: ");
+  logger.info(bot.username + " - (" + bot.id + ")");
 
-bot.on('ready', function (evt) {
-    logger.info('Connected');
-    logger.info('Logged in as: ');
-    logger.info(bot.username + ' - (' + bot.id + ')');
+  const members = bot.servers["497486687681773579"].members;
+  const ciatek_server = bot.servers["497486687681773579"];
 
-    // ************************** Get all member of Ciatek Server Start **************************
+  Scripts.getAllCiatekMembersUserName(members).then(
+    membersofCiatekUserName =>
+      (members_of_Ciatek_UserName = membersofCiatekUserName)
+  );
 
-    let members = bot.servers['497486687681773579'].members
-    // initializing members array
-    let members_array = []
-    // looping the members by ids
-    for(let ids in members){
-        let membersIds = members[ids]
-        // looping member ids by member
-        for(let member in membersIds){
-            // assigning this object to the keys of member
-            let existing_members = {
-                ...member
-            }
-            // assigning the members to be equal to that of member Ids
-            existing_members[member] = membersIds[member]
-            // push the members username to new array
-            members_array.push(existing_members.username)
-            // filter 1 for removing keys---- filter 2 for removing undefined
-            let membersFilter = members_array.filter( (nick) => nick !== member).filter( (nick) => nick != undefined)
-            // console.log(membersFilter)
-            members_of_Ciatek = membersFilter
-        }
-    }
-
-    // ************************** Get Members of Ciatek Finish **************************
-
-    // ************************** Get Channels of Ciatek Start **************************
-    
-    ciatek = bot.servers['497486687681773579']
-    // console.log(ciatek.channels)
-    for(ids in ciatek.channels){
-        // console.log(ciatek.channels[ids])
-        let channels = ciatek.channels[ids]
-        for(channel in channels){
-            let index = channels_of_ciatek.indexOf(channels)
-            if(index < 0){
-                channels_of_ciatek.push(channels)
-            }
-        }
-    }
-
-    // ************************** Get Channels of Ciatek Finish **************************
-
-    // console.log(ciatek)
-
+  Scripts.getAllCiatekChannels(ciatek_server).then(
+    channelsOfCiatek => (channels_of_ciatek = channelsOfCiatek)
+  );
 });
-bot.on('message', async function (user, userID, channelID, message, evt) {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
-    if (message.substring(0, 1) == '!') {
-        var args = message.substring(1).split(' ');
-        console.log(args)
-        var cmd = args[0];
-       
-        args = args.splice(1);
-        switch(cmd) {
-            // !ping
-            case 'ping':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `Pong!`
-                });
-            break;
-           
-            case 'members':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `Members of Ciatek are: ${members_of_Ciatek.map( (member) => `# ${member}`)}`
-                });
-            break;
-            
-            case 'channels':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `Channels of Ciatek are: ${channels_of_ciatek.map( channel => `# ${channel.name}`)}`
-                });
-            break;
-            
-            case 'server_name':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `Name of the Server is ${ciatek.name}`
-                });
-                bot.uploadFile({
-                    to: channelID,
-                    file: "./assets/images/cia.png"
-                })
-            break;
-            
-            case 'ciatek':
-                bot.sendMessage({
-                    to: channelID,
-                    message: ` 
+bot.on("message", async function(user, userID, channelID, message, evt) {
+  // Our bot needs to know if it will execute a command
+  // > It will listen for messages that will start with `!`
+
+  if (message.substring(0, 1) == "!") {
+    let args = message.substring(1).split(" ");
+    console.log(args);
+    let cmd = args[0];
+
+    args = args.splice(1);
+    switch (cmd) {
+      // !ping
+      case "ping":
+        bot.sendMessage({
+          to: channelID,
+          message: `Pong!`
+        });
+        break;
+
+      case "members":
+        bot.sendMessage({
+          to: channelID,
+          message: `Members of Ciatek are: ${members_of_Ciatek_UserName.map(
+            member => `# ${member}`
+          )}`
+        });
+        break;
+
+      case "channels":
+        bot.sendMessage({
+          to: channelID,
+          message: `Channels of Ciatek are: ${channels_of_ciatek.map(
+            channel => `# ${channel.name}`
+          )}`
+        });
+        break;
+
+      case "server_name":
+        bot.sendMessage({
+          to: channelID,
+          message: `Name of the Server is ${ciatek.name}`
+        });
+        bot.uploadFile({
+          to: channelID,
+          file: "./assets/images/cia.png"
+        });
+        break;
+
+      case "ciatek":
+        bot.sendMessage({
+          to: channelID,
+          message: ` 
                     Welcome to Ciatek
                     `
-                });
-                bot.uploadFile({
-                    to: channelID,
-                    file: "./assets/images/cia.png"
-                })
-            break;
-            
-            case 'help':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `🚀 Commands you can use are:
+        });
+        bot.uploadFile({
+          to: channelID,
+          file: "./assets/images/cia.png"
+        });
+        break;
+
+      case "help":
+        bot.sendMessage({
+          to: channelID,
+          message: `🚀 Commands you can use are:
                         !ping
                         !members
                         !server_name
@@ -138,34 +110,13 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
                         !channels
                         !ciatek
                     `
-                });
-            break;
-            
-        //     case 'purge':
-        //      // This command removes all messages from all users in the channel, up to 100.
-        
-        // // get the delete count, as an actual number.
-        // const deleteCount = parseInt(args[0], 10);
-        
-        // // Ooooh nice, combined conditions. <3
-        // // console.log("test", deleteCount, args)
-        //         if(!deleteCount || deleteCount < 2 || deleteCount > 100)
-        //         return bot.sendMessage({
-        //             to: channelID,
-        //             message: "Please provide a number between 2 and 100 for the number of messages to delete" 
-        //             })
-                    
-        //             // So we get our messages, and delete them. Simple enough, right?
-        //             const fetched = await message.channel.fetchMessages({limit: deleteCount});
-        //             message.channel.bulkDelete(fetched)
-        //         .catch(error => message.reply(`Couldn't delete messages because of: ${error}`));
-        //     break;
-            
-            // Just add any case commands if you want to..
-            case 'resources':
-            bot.sendMessage({
-                to: channelID,
-                message: `    
+        });
+        break;
+
+      case "resources":
+        bot.sendMessage({
+          to: channelID,
+          message: `    
                         # Resources Are:   
                     (How to set up file upload with React and Node)[https://medium.freecodecamp.org/how-to-create-file-upload-with-react-and-node-2aa3f9aab3f0]    
                     (Node Js in 3 min)[https://medium.com/@kieranmaher13/nodejs-in-three-ish-minutes-4c4401b43b2c]    
@@ -173,101 +124,102 @@ bot.on('message', async function (user, userID, channelID, message, evt) {
                     (How to write MarkDown)[https://www.markdownguide.org/basic-syntax/#overview]    
                     (How To Write Better Code in React)[https://blog.bitsrc.io/how-to-write-better-code-in-react-best-practices-b8ca87d462b0]    
                 `
-            });
-            break;
-         }
-     }
+        });
+        break;
+    }
+  }
 
-        switch(message){
-        case 'haha':
-        bot.sendMessage({
-            to: channelID,
-            message: 'hahahahahhahaha'
-        });
-        break;
+  // > Without "!"
 
-        case 'bye':
-        bot.sendMessage({
-            to: channelID,
-            message: 'See you soon :crying_cat_face:'
-        });
-        break;
+  switch (message) {
+    case "haha":
+      bot.sendMessage({
+        to: channelID,
+        message: "hahahahahhahaha"
+      });
+      break;
 
-        case 'hi':
-        bot.sendMessage({
-            to: channelID,
-            message: `Hi ${user}`
-        });
-        break;
-        
-        case 'hello':
-        bot.sendMessage({
-            to: channelID,
-            message: `Hello ${user}`
-        });
-        break;
-        
-        case 'Good Morning':
-        bot.sendMessage({
-            to: channelID,
-            message: `Good Morning ${user}`
-        });
-        break;
-        
-        case 'good morning':
-        bot.sendMessage({
-            to: channelID,
-            message: `Good Morning ${user}`
-        });
-        break;
-        
-        case 'How are you?':
-        bot.sendMessage({
-            to: channelID,
-            message: `I m Good How are you ${user} ?`
-        });
-        break;
-        
-        case 'How are you today?':
-        bot.sendMessage({
-            to: channelID,
-            message: `I m Good How are you ${user}?`
-        });
-        break;
-        
-        case 'I m fine':
-        bot.sendMessage({
-            to: channelID,
-            message: `Good to hear that ${user}`
-        });
-        break;
-        
-        case 'I m good':
-        bot.sendMessage({
-            to: channelID,
-            message: `Good to hear that ${user} `
-        });
-        break;
-            
-     }
+    case "bye":
+      bot.sendMessage({
+        to: channelID,
+        message: "See you soon :crying_cat_face:"
+      });
+      break;
 
-    //  if(message == "!purge") {
-    //     // This command removes all messages from all users in the channel, up to 100.
-        
-    //     // get the delete count, as an actual number.
-    //     const deleteCount = parseInt(args[1], 10);
-        
-    //     // Ooooh nice, combined conditions. <3
-    //     console.log("test", deleteCount)
-    //     if(!deleteCount || deleteCount < 2 || deleteCount > 100)
-    //       return message.sendMessage({
-    //         to: channelID,
-    //         message: "Please provide a number between 2 and 100 for the number of messages to delete" 
-    //     })
-        
-    //     // So we get our messages, and delete them. Simple enough, right?
-    //     const fetched = await message.channel.fetchMessages({limit: deleteCount});
-    //     message.channel.bulkDelete(fetched)
-    //       .catch(error => message.reply(`Couldn't delete messages because of: ${error}`));
-    //   }
+    case "hi":
+      bot.sendMessage({
+        to: channelID,
+        message: `Hi ${user}`
+      });
+      break;
+
+    case "hello":
+      bot.sendMessage({
+        to: channelID,
+        message: `Hello ${user}`
+      });
+      break;
+
+    case "Good Morning":
+      bot.sendMessage({
+        to: channelID,
+        message: `Good Morning ${user}`
+      });
+      break;
+
+    case "good morning":
+      bot.sendMessage({
+        to: channelID,
+        message: `Good Morning ${user}`
+      });
+      break;
+
+    case "How are you?":
+      bot.sendMessage({
+        to: channelID,
+        message: `I m Good How are you ${user} ?`
+      });
+      break;
+
+    case "How are you today?":
+      bot.sendMessage({
+        to: channelID,
+        message: `I m Good How are you ${user}?`
+      });
+      break;
+
+    case "I m fine":
+      bot.sendMessage({
+        to: channelID,
+        message: `Good to hear that ${user}`
+      });
+      break;
+
+    case "I m good":
+      bot.sendMessage({
+        to: channelID,
+        message: `Good to hear that ${user} `
+      });
+      break;
+  }
+});
+
+bot.on("guildMemberAdd", member => {
+  const members = bot.servers["497486687681773579"].members;
+  const channels = bot.servers["497486687681773579"].channels;
+
+  Scripts.getNewMember(members, member.id).then(newMember => {
+    const mentionNewMember = "<@!" + newMember.id + ">";
+    const welcome_channel = "<#" + channels["497490728709259265"].id + ">";
+
+    bot.sendMessage({
+      to: "497491158063251497",
+      message: `Hi ${mentionNewMember} and Welcome To Ciatek Server 🙌. We are Excited to See you Here Among Us 🤩. Please Read 👀 the ${welcome_channel} Channel to see how to Use Discord Better. Also Feel Free to Surf 🏂 around the channels you Have Permission to See and Chat. Thank You For Joining Us. 🎉 🎂 🎈`
+    });
+
+    bot.uploadFile({
+      to: "497491158063251497",
+      file: "./assets/images/cia.png"
+    });
+  });
 });

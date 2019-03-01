@@ -1,9 +1,9 @@
 # CONAN DISCORD BOT `CIATEK`
 
-<!-- [![Build Status](https://travis-ci.com/ahmadyassinkhoja/supermarket-front-end.svg?token=qygxqkdc5qqrxr91xxDH&branch=master)](https://travis-ci.com/ahmadyassinkhoja/supermarket-front-end)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/929bed75b3cd4b07abb341c7a5591725)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=ahmadyassinkhoja/supermarket-front-end&utm_campaign=Badge_Grade)
+
+<!-- [![Codacy Badge](https://api.codacy.com/project/badge/Grade/929bed75b3cd4b07abb341c7a5591725)](https://www.codacy.com?utm_source=github.com&utm_medium=referral&utm_content=ahmadyassinkhoja/supermarket-front-end&utm_campaign=Badge_Grade)
 [![JavaScript Style Guide: Good Parts](https://img.shields.io/badge/code%20style-goodparts-brightgreen.svg?style=flat)](https://github.com/dwyl/goodparts "JavaScript The Good Parts")
-[![GitHub last commit](https://img.shields.io/github/last-commit/google/skia.svg?style=flat)](<>) -->
+[![GitHub last commit](https://img.shields.io/github/last-commit/google/skia.svg?style=flat)](<>) --> -->
 
 ## Getting Started
 

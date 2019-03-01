@@ -16,7 +16,6 @@ const bot = new Discord.Client({
   autorun: true
 });
 
-let new_member = {};
 let ciatek = {};
 let members_of_Ciatek_UserName = [];
 let channels_of_ciatek = [];
